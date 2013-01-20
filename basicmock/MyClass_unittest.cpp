@@ -3,12 +3,25 @@
 #include "gmock/gmock.h"
 
 using ::testing::AtLeast;
+using ::testing::Return;
 
 class InterfaceMock : public Interface 
 {
 	public:
 		MOCK_METHOD0(readData, void());
+		MOCK_METHOD1(printData, void(int));
+		MOCK_METHOD1(check, int(int));
 };
+
+TEST(MyCalculator, Initialization)
+{
+	InterfaceMock mock;
+	MyCalculator calc(&mock);
+
+	EXPECT_CALL(mock, check(1)).Times(1).WillOnce(Return(1));
+
+	EXPECT_EQ(1,calc.initialize(1));
+}
 
 TEST(MyCalculator, Addition)
 {
@@ -18,8 +31,12 @@ TEST(MyCalculator, Addition)
 
 TEST(MyCalculator, Substraction)
 {
-	MyCalculator m;
-	EXPECT_EQ(0, m.sub(1,1)) << "Substraction of 2 numbers Failed";
+	InterfaceMock interfaceMock;
+	MyCalculator cal(&interfaceMock);
+
+	EXPECT_CALL(interfaceMock, printData(0)).Times(1);
+	
+	EXPECT_EQ(0, cal.sub(1,1)) << "Substraction of 2 numbers Failed";
 }
 
 TEST(MyCalculator, MockTest)

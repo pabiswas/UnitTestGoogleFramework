@@ -5,6 +5,8 @@ class Interface
 {
 	public:
 		virtual void readData()=0;
+		virtual void printData(int) = 0;
+		virtual int check(int)=0;
 
 };
 
@@ -19,6 +21,11 @@ class MyCalculator
 	{
 		_t = t;
 	}
+	
+	int initialize(int i)
+	{
+		return	_t->check(i);
+	}
 
 	int add(int i, int j)
 	{
@@ -27,6 +34,7 @@ class MyCalculator
 
 	int sub(int i, int j)
 	{
+		_t->printData(i-j);
 		return i - j;
 	}
 
