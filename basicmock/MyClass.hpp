@@ -24,6 +24,7 @@ class MyCalculator
 	
 	int initialize(int i)
 	{
+		_t->printData(i);
 		return	_t->check(i);
 	}
 

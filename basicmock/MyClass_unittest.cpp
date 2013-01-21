@@ -4,6 +4,7 @@
 
 using ::testing::AtLeast;
 using ::testing::Return;
+using ::testing::NiceMock;
 
 class InterfaceMock : public Interface 
 {
@@ -17,7 +18,17 @@ TEST(MyCalculator, Initialization)
 {
 	InterfaceMock mock;
 	MyCalculator calc(&mock);
+	
+	EXPECT_CALL(mock, check(1)).Times(1).WillOnce(Return(1));
 
+	EXPECT_EQ(1,calc.initialize(1));
+}
+
+TEST(MyCalculator, SuppressWarningForUninterestedCalls)
+{
+	NiceMock<InterfaceMock> mock;
+	MyCalculator calc(&mock);
+	
 	EXPECT_CALL(mock, check(1)).Times(1).WillOnce(Return(1));
 
 	EXPECT_EQ(1,calc.initialize(1));
