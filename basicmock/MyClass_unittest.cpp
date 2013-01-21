@@ -5,6 +5,7 @@
 using ::testing::AtLeast;
 using ::testing::Return;
 using ::testing::NiceMock;
+using ::testing::StrictMock;
 
 class InterfaceMock : public Interface 
 {
