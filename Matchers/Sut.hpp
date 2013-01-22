@@ -11,6 +11,10 @@ class Intf
 class Sut
 {
 	public:
+	Sut()
+	{
+	}
+
 	Sut(Intf* intf): _a(0), _b(0), _c(0)
 	{
 		_intf = intf;
@@ -19,6 +23,11 @@ class Sut
 	void setA(int i)
 	{
 		_a = i;
+	}
+
+	int getA() const
+	{
+		return _a;
 	}
 	
 	void setB(int i)
@@ -35,6 +44,8 @@ class Sut
 	{
 		_intf->dummyFunc(_a,_b,_c);
 	}
+
+	int d;
 
 	private:
 	int _a, _b, _c;
