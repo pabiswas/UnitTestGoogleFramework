@@ -20,7 +20,8 @@ TEST(MyCalculator, Initialization)
 	InterfaceMock mock;
 	MyCalculator calc(&mock);
 	
-	EXPECT_CALL(mock, check(1)).Times(1).WillOnce(Return(1));
+	EXPECT_CALL(mock, printData(1)).Times(1);
+	EXPECT_CALL(mock, check(1)).Times(1).WillRepeatedly(Return(1));
 
 	EXPECT_EQ(1,calc.initialize(1));
 }

@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include <string>
+#include <ostream>
 
 #include "Sut.hpp"
 
@@ -13,12 +14,42 @@ using ::testing::Ge;
 using ::testing::Eq;
 using ::testing::Property;
 using ::testing::Field;
+using ::testing::Pointee;
+using ::testing::MatcherInterface;
+using ::testing::MatchResultListener;
+using ::testing::MakeMatcher;
+using ::testing::internal::StringMatchResultListener;
 
 class MockIntf : public Intf
 {
 	public:
 	MOCK_METHOD3(dummyFunc, void(int, int, int));
+	MOCK_METHOD1(dummyPointer, void(int*));
 };
+
+class SumIsGreaterThan : public MatcherInterface<const Sut&>
+{
+	public:
+		explicit SumIsGreaterThan(int min):_min(min) {}
+
+		virtual void DescribeTo(std::ostream* os) const 
+		{
+		}
+
+		virtual bool MatchAndExplain(const Sut& testObj, MatchResultListener* listener) const
+		{
+			return (testObj.getA() + testObj.getB() ) > _min;
+		}
+
+	private:
+		int _min;
+
+};
+
+Matcher<const Sut&> checkSumGreaterThan(int minimum)
+{
+	return MakeMatcher(new SumIsGreaterThan(minimum));
+}
 
 TEST(StringMatcherTest, ImplicitlyConstruction) 
 {
@@ -71,4 +102,30 @@ TEST(MatcherTest, PropertyTesting)
 	EXPECT_FALSE(m.Matches(testObj));
 	testObj.d=0;
 	EXPECT_TRUE(m.Matches(testObj));
+}
+
+TEST(MatcherTest, PointeeTest)
+{
+	MockIntf mock;
+	Sut testObj(&mock);
+
+	testObj.d=3;
+	EXPECT_CALL(mock, dummyPointer(Pointee(3)));
+
+	testObj.checkD();
+}
+
+TEST(MatcherTest, MatchAndExplain)
+{
+	Matcher<const Sut&> m = checkSumGreaterThan(10);
+	StringMatchResultListener listener;
+	MockIntf mock;
+	Sut testObj(&mock);
+	
+	testObj.setA(5);
+	testObj.setB(6);
+	EXPECT_TRUE(m.MatchAndExplain(testObj, &listener));
+
+	testObj.setB(1);
+	EXPECT_FALSE(m.MatchAndExplain(testObj, &listener));
 }

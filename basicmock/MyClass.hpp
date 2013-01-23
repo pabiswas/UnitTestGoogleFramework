@@ -7,7 +7,6 @@ class Interface
 		virtual void readData()=0;
 		virtual void printData(int) = 0;
 		virtual int check(int)=0;
-
 };
 
 class MyCalculator

@@ -6,6 +6,7 @@ class Intf
 {
 	public:
 	virtual void dummyFunc(int, int, int) = 0;
+	virtual void dummyPointer(int*) = 0;
 };
 
 class Sut
@@ -34,7 +35,12 @@ class Sut
 	{
 		_b = i;
 	}
-	
+
+	int getB() const
+	{
+		return _b;
+	}
+
 	void setC(int i)
 	{
 		_c = i;
@@ -43,6 +49,11 @@ class Sut
 	void doATask()
 	{
 		_intf->dummyFunc(_a,_b,_c);
+	}
+
+	void checkD()
+	{
+		_intf->dummyPointer(&d);
 	}
 
 	int d;
