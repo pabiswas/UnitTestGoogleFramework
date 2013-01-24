@@ -1,12 +1,14 @@
 #ifndef SUT_HPP
 #define SUT_HPP
 
+#include <vector>
 
 class Intf
 {
 	public:
 	virtual void dummyFunc(int, int, int) = 0;
 	virtual void dummyPointer(int*) = 0;
+	virtual void dataContainer(const std::vector<int>& data) = 0;
 };
 
 class Sut
@@ -56,11 +58,22 @@ class Sut
 		_intf->dummyPointer(&d);
 	}
 
+	void compute()
+	{
+		_intf->dataContainer(mContainer);
+	}
+
+	void insertData(int i)
+	{
+		mContainer.push_back(i);
+	}
+
 	int d;
 
 	private:
 	int _a, _b, _c;
 	Intf* _intf;
+	std::vector<int> mContainer;
 };
 
 #endif

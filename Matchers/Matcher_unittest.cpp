@@ -19,12 +19,15 @@ using ::testing::MatcherInterface;
 using ::testing::MatchResultListener;
 using ::testing::MakeMatcher;
 using ::testing::internal::StringMatchResultListener;
+using ::testing::ElementsAre;
+using ::testing::ElementsAreArray;
 
 class MockIntf : public Intf
 {
 	public:
 	MOCK_METHOD3(dummyFunc, void(int, int, int));
 	MOCK_METHOD1(dummyPointer, void(int*));
+	MOCK_METHOD1(dataContainer, void(const std::vector<int>& data));
 };
 
 class SumIsGreaterThan : public MatcherInterface<const Sut&>
@@ -45,6 +48,14 @@ class SumIsGreaterThan : public MatcherInterface<const Sut&>
 		int _min;
 
 };
+
+template <typename MatcherType, typename Value>
+std::string Explain(const MatcherType& m, const Value& x) 
+{
+	std::stringstream ss;
+	m.ExplainMatchResultTo(x, &ss);
+	return ss.str();
+}
 
 Matcher<const Sut&> checkSumGreaterThan(int minimum)
 {
@@ -128,4 +139,41 @@ TEST(MatcherTest, MatchAndExplain)
 
 	testObj.setB(1);
 	EXPECT_FALSE(m.MatchAndExplain(testObj, &listener));
+}
+
+TEST(MatcherTest, VectorContainerTest)
+{
+	MockIntf mock;
+	Sut testObj(&mock);
+
+	testObj.insertData(1);
+	testObj.insertData(11);
+	testObj.insertData(0);
+
+	EXPECT_CALL(mock, dataContainer(ElementsAre(1,11,0)));
+	testObj.compute();	
+}
+
+TEST(MatcherTest, ElementsAreArray)
+{
+	MockIntf mock;
+	Sut testObj(&mock);
+
+	for(int i=0;i<10;i++)
+		testObj.insertData(i*2);
+	
+	Matcher<int> expected_vector[] = {0, Ge(1), _, Eq(6), 8, 10, 12, _, _, 18};
+	EXPECT_CALL(mock, dataContainer(ElementsAreArray(expected_vector)));
+	testObj.compute();
+}
+
+TEST(MatcherTest, ExplainMe)
+{
+	Matcher<const std::vector<int> > m = ElementsAre(5,15);
+
+	std::vector<int> vecInt;
+	vecInt.push_back(5);
+	vecInt.push_back(1);
+
+	EXPECT_EQ("whose element #1 doesn't match", Explain(m, vecInt));
 }
